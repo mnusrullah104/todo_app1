@@ -1,0 +1,25 @@
+[project]
+name = "todo-console-app"
+version = "0.1.0"
+description = "A command-line Todo application for managing tasks in memory"
+requires-python = ">=3.13"
+readme = "README.md"
+authors = [
+    { name = "Claude Code", email = "noreply@anthropic.com" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
+
+[project.scripts]
+todo = "src.main:main"
