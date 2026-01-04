@@ -58,7 +58,7 @@ async def app_exception_handler(request: Request, exc: TodoAppException):
 
     return JSONResponse(
         status_code=exc.status_code,
-        content=error_response.model_dump(exclude_none=True),
+        content=error_response.model_dump(mode='json', exclude_none=True),
     )
 
 
@@ -90,7 +90,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=error_response.model_dump(exclude_none=True),
+        content=error_response.model_dump(mode='json', exclude_none=True),
     )
 
 
@@ -114,7 +114,7 @@ async def database_exception_handler(request: Request, exc: SQLAlchemyError):
 
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        content=error_response.model_dump(exclude_none=True),
+        content=error_response.model_dump(mode='json', exclude_none=True),
         headers={"Retry-After": "30"},
     )
 
@@ -140,5 +140,5 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content=error_response.model_dump(exclude_none=True),
+        content=error_response.model_dump(mode='json', exclude_none=True),
     )
