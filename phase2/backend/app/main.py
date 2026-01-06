@@ -91,9 +91,22 @@ origins = [
     "http://127.0.0.1:3000",
 ]
 
+# Allow configuring additional origins via env (.env)
+# Example: BACKEND_CORS_ORIGINS=http://192.168.1.50:3000,http://myhost:3000
+cors_env = os.getenv("BACKEND_CORS_ORIGINS")
+if cors_env:
+    origins.extend([o.strip() for o in cors_env.split(",") if o.strip()])
+
+# In development, also allow typical LAN origins (helps when accessing the frontend via Network URL)
+environment = os.getenv("ENVIRONMENT", "development").lower()
+allow_origin_regex = None
+if environment == "development":
+    allow_origin_regex = r"^http://(localhost|127\\.0\\.0\\.1|192\\.168\\.\\d+\\.\\d+):3000$"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=allow_origin_regex,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
