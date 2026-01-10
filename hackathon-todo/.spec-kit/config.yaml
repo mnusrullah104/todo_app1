@@ -1,0 +1,44 @@
+# Specification Kit Configuration
+project:
+  name: "Hackathon Todo App"
+  version: "1.0.0"
+  description: "A full-stack todo application built with Next.js, FastAPI, and Better Auth"
+  type: "fullstack"
+
+directories:
+  specs:
+    path: "specs/"
+    sections:
+      - "overview.md"
+      - "architecture.md"
+      - "features/"
+      - "api/"
+      - "database/"
+      - "ui/"
+
+  frontend:
+    path: "frontend/"
+    framework: "nextjs"
+    version: "16+"
+    language: "typescript"
+
+  backend:
+    path: "backend/"
+    framework: "fastapi"
+    language: "python"
+    orm: "sqlmodel"
+    database: "postgresql"
+
+  root:
+    files:
+      - "CLAUDE.md"
+      - "README.md"
+      - ".gitignore"
+
+specifications:
+  enforced: true
+  validation: strict
+  generation_rules:
+    - "all code must be generated from specs"
+    - "no manual coding without spec"
+    - "follow architecture.md strictly"

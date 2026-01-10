@@ -1,11 +1,15 @@
 """
-FastAPI application entry point for Phase II Todo Web Application.
+FastAPI application entry point for Hackathon Todo App.
+
+This module initializes the FastAPI application with all necessary
+middleware, exception handlers, and API routes.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from app.api import health, auth, tasks
+
+from app.api import health, tasks
 from app.core.exceptions import TodoAppException
 from app.middleware.error_handler import (
     app_exception_handler,
@@ -20,13 +24,12 @@ import os
 app = FastAPI(
     title="Todo API",
     description="""
-# Phase II Todo Web Application API
+# Hackathon Todo App API
 
 A modern, full-stack todo application backend built with FastAPI.
 
 ## Features
 
-- **User Authentication**: JWT-based authentication with secure password hashing
 - **Task Management**: Full CRUD operations for personal tasks
 - **Data Isolation**: Users can only access their own tasks
 - **Security**: Rate limiting, input sanitization, security headers
@@ -34,29 +37,25 @@ A modern, full-stack todo application backend built with FastAPI.
 
 ## Quick Start
 
-1. Register a new account at `/auth/register`
-2. Login at `/auth/login` to receive a JWT token
-3. Include the token in the `Authorization: Bearer <token>` header
+1. Register a new account via Better Auth
+2. Login with credentials via Better Auth
+3. Access your tasks using the authenticated token
 4. Create and manage your tasks!
 
 ## Authentication
 
-All task endpoints require authentication. Include your JWT token in the Authorization header:
+All task endpoints require a valid Better Auth JWT token. Include your JWT token in the Authorization header:
 
 ```
-Authorization: Bearer your-jwt-token-here
+Authorization: Bearer your-better-auth-jwt-token-here
 ```
 
 ## Rate Limits
 
-- Registration: 5 requests per 15 minutes
-- Login: 10 requests per 15 minutes
-
-## Resources
-
-- [Frontend Repository](#)
-- [Documentation](#)
-- [GitHub Issues](#)
+- Task Creation: 10 requests per minute per user
+- Task Updates: 20 requests per minute per user
+- Task Deletion: 10 requests per minute per user
+- Task Retrieval: 30 requests per minute per user
 """,
     version="1.0.0",
     docs_url="/docs",
@@ -67,17 +66,13 @@ Authorization: Bearer your-jwt-token-here
             "description": "Health check endpoint for monitoring"
         },
         {
-            "name": "authentication",
-            "description": "User registration and login operations"
-        },
-        {
             "name": "tasks",
             "description": "Task management operations (CRUD)"
         },
     ],
     contact={
         "name": "Todo App Team",
-        "email": "support@todoapp.example.com",
+        "email": "support@todoapp.hackathon.com",
     },
     license_info={
         "name": "MIT",
@@ -89,6 +84,8 @@ Authorization: Bearer your-jwt-token-here
 origins = [
     "http://localhost:3000",  # Next.js frontend (development)
     "http://127.0.0.1:3000",
+    "http://localhost:3001",  # Next.js frontend when port 3000 is taken
+    "http://127.0.0.1:3001",
 ]
 
 # Allow configuring additional origins via env (.env)
@@ -101,7 +98,7 @@ if cors_env:
 environment = os.getenv("ENVIRONMENT", "development").lower()
 allow_origin_regex = None
 if environment == "development":
-    allow_origin_regex = r"^http://(localhost|127\\.0\\.0\\.1|192\\.168\\.\\d+\\.\\d+):3000$"
+    allow_origin_regex = r"^http://(localhost|127\\.0\\.0\\.1|192\\.168\\.\\d+\\.\\d+):(3000|3001)$"
 
 app.add_middleware(
     CORSMiddleware,
@@ -126,9 +123,7 @@ app.add_exception_handler(Exception, generic_exception_handler)
 
 # Include routers
 app.include_router(health.router, tags=["health"])
-app.include_router(auth.router, prefix="/auth", tags=["authentication"])
-app.include_router(tasks.router, tags=["tasks"])
-
+app.include_router(tasks.router, prefix="/api", tags=["tasks"])
 
 @app.get("/")
 async def root():
